@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
     <head>
         <meta charset="utf-8">
@@ -745,7 +745,9 @@
 
         <script>
         // Initialize Lucide icons
-        lucide.createIcons();
+        document.addEventListener('DOMContentLoaded', function() {
+            lucide.createIcons();
+        });
 
         // Wait for map to be initialized
         let mapInitialized = false;
@@ -881,19 +883,23 @@
             const visibilityToggles = document.querySelectorAll('.visibility-toggle');
             
             visibilityToggles.forEach(toggle => {
-                toggle.addEventListener('click', function() {
+                toggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
                     const layerKey = this.getAttribute('data-layer');
-                    const isVisible = layerState[layerKey].visible;
-                    
-                    // Toggle visibility
-                    layerState[layerKey].visible = !isVisible;
-                    toggleLayerVisibility(layerKey, !isVisible);
-                    
-                    // Update button appearance
-                    updateVisibilityButton(this, !isVisible);
-                    
-                    // Sync with legend
-                    syncLegendToggle(layerKey, !isVisible);
+                    if (layerKey && layerState[layerKey]) {
+                        const isVisible = !layerState[layerKey].visible;
+                        
+                        // Toggle visibility
+                        layerState[layerKey].visible = isVisible;
+                        toggleLayerVisibility(layerKey, isVisible);
+                        
+                        // Update button appearance
+                        updateVisibilityButton(this, isVisible);
+                        
+                        // Sync with legend
+                        syncLegendToggle(layerKey, isVisible);
+                    }
                 });
             });
         }
@@ -924,22 +930,23 @@
             
             legendToggles.forEach(toggle => {
                 toggle.addEventListener('click', function(e) {
+                    e.preventDefault();
                     e.stopPropagation();
                     const legendItem = this.closest('.legend-item');
                     const layerKey = legendItem.getAttribute('data-layer');
                     
                     if (layerKey && layerState[layerKey]) {
-                        const isVisible = layerState[layerKey].visible;
+                        const isVisible = !layerState[layerKey].visible;
                         
                         // Toggle visibility
-                        layerState[layerKey].visible = !isVisible;
-                        toggleLayerVisibility(layerKey, !isVisible);
+                        layerState[layerKey].visible = isVisible;
+                        toggleLayerVisibility(layerKey, isVisible);
                         
                         // Update legend button
-                        updateLegendButton(this, !isVisible);
+                        updateLegendButton(this, isVisible);
                         
                         // Sync with layer control
-                        syncVisibilityToggle(layerKey, !isVisible);
+                        syncVisibilityToggle(layerKey, isVisible);
                     }
                 });
             });
@@ -979,16 +986,22 @@
         // Helper functions
         function updateVisibilityButton(button, isVisible) {
             const icon = button.querySelector('i');
-            button.className = `visibility-toggle ${isVisible ? 'visible' : 'hidden'}`;
-            icon.setAttribute('data-lucide', isVisible ? 'eye' : 'eye-off');
-            lucide.createIcons();
+            if (icon) {
+                button.classList.remove('visible', 'hidden');
+                button.classList.add(isVisible ? 'visible' : 'hidden');
+                icon.setAttribute('data-lucide', isVisible ? 'eye' : 'eye-off');
+                lucide.createIcons();
+            }
         }
 
         function updateLegendButton(button, isVisible) {
             const icon = button.querySelector('i');
-            button.className = `legend-toggle ${isVisible ? 'visible' : 'hidden'}`;
-            icon.setAttribute('data-lucide', isVisible ? 'eye' : 'eye-off');
-            lucide.createIcons();
+            if (icon) {
+                button.classList.remove('visible', 'hidden');
+                button.classList.add(isVisible ? 'visible' : 'hidden');
+                icon.setAttribute('data-lucide', isVisible ? 'eye' : 'eye-off');
+                lucide.createIcons();
+            }
         }
 
         function syncLegendToggle(layerKey, isVisible) {
