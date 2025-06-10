@@ -116,6 +116,9 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            width: 40px;
+            height: 40px;
+            z-index: 3100; /* High z-index for clickability */
         }
 
         .panel-toggle:hover {
@@ -126,18 +129,17 @@
         /* Toggle button when collapsed */
         .collapsed .panel-toggle {
             position: absolute;
-            right: -48px; /* Increased slightly for better click area */
+            right: -48px; /* Increased for better click area */
             top: 50%;
             transform: translateY(-50%);
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.2);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            z-index: 3000; /* Higher z-index to ensure clickability */
+            z-index: 3100; /* Higher z-index to ensure clickability */
             width: 40px;
             height: 40px;
             cursor: pointer;
-            padding: 8px;
             border-radius: 12px;
         }
 
@@ -148,14 +150,14 @@
 
         /* Ensure panels don’t interfere with clicks when collapsed */
         .modern-panel.collapsed {
-            overflow: visible; /* Allow toggle button to be accessible outside panel bounds */
+            overflow: visible; /* Allow toggle button to be accessible */
         }
 
         /* Hover effect for better feedback */
         .panel-toggle:hover {
             background: #f1f5f9;
             color: #1e293b;
-            transform: translateY(-50%) scale(1.05); /* Slight scale for visual feedback */
+            transform: translateY(-50%) scale(1.05); /* Slight scale for feedback */
         }
 
         /* Panel Content */
@@ -477,7 +479,7 @@
             }
             
             .collapsed .panel-toggle {
-                z-index: 3100; /* Even higher z-index for mobile to ensure clickability */
+                z-index: 3100; /* High z-index for mobile clickability */
             }
         }
 
@@ -798,7 +800,7 @@
 
             // Layer Control Panel Toggle
             if (layerControlToggle && layerControlPanel) {
-                layerControlToggle.addEventListener('click', function() {
+                layerControlToggle.onclick = function() {
                     layerControlPanel.classList.toggle('collapsed');
                     const icon = this.querySelector('i');
                     
@@ -809,12 +811,12 @@
                     }
                     
                     lucide.createIcons();
-                });
+                };
             }
 
             // Legend Panel Toggle
             if (legendToggle && legendPanel) {
-                legendToggle.addEventListener('click', function() {
+                legendToggle.onclick = function() {
                     legendPanel.classList.toggle('collapsed');
                     const icon = this.querySelector('i');
                     
@@ -825,7 +827,7 @@
                     }
                     
                     lucide.createIcons();
-                });
+                };
             }
         }
 
