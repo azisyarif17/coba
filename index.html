@@ -11,357 +11,418 @@
         <link rel="stylesheet" href="./resources/ol-layerswitcher.css">
         <link rel="stylesheet" href="./resources/qgis2web.css">
         <!-- Google Fonts -->
-        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+        <!-- Lucide Icons -->
+        <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
         
         <style>
         html, body {
-            background-color: #ffffff;
-            font-family: 'Poppins', sans-serif;
-        }
-        .ol-control > * {
-            background-color: #f8f8f8!important;
-            color: #444444!important;
-            border-radius: 0px;
-        }
-        .ol-attribution a, .gcd-gl-input::placeholder, .search-layer-input-search::placeholder {
-            color: #444444!important;
-        }
-        .search-layer-input-search {
-            background-color: #f8f8f8!important;
-        }
-        .ol-control > *:focus, .ol-control >*:hover {
-            background-color: rgba(248, 248, 248, 0.7)!important;
-        } 
-        .ol-control {
-            background-color: rgba(255,255,255,.4) !important;
-            padding: 2px !important;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
         }
 
-        /* Legend Panel Styles */
-        .legend-panel {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: linear-gradient(145deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 248, 248, 0.98) 100%);
-            border: 2px solid #1B263B;
-            border-radius: 12px;
-            padding: 15px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-            backdrop-filter: blur(10px);
-            min-width: 280px;
-            max-width: 320px;
+        /* Modern Control Panel Base Styles */
+        .modern-panel {
+            position: fixed;
             z-index: 2000;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            min-width: 320px;
+            max-width: 384px;
+        }
+
+        /* Layer Control Panel */
+        .layer-control-panel {
+            top: 24px;
+            left: 24px;
+        }
+
+        .layer-control-panel.collapsed {
+            transform: translateX(calc(-100% + 48px));
+        }
+
+        /* Legend Panel */
+        .legend-panel {
+            top: 24px;
+            right: 24px;
         }
 
         .legend-panel.collapsed {
-            transform: translateX(calc(100% - 45px));
+            transform: translateX(calc(100% - 48px));
         }
 
-        .legend-header {
+        /* Map Info Panel */
+        .map-info-panel {
+            bottom: 24px;
+            left: 24px;
+            max-width: 320px;
+        }
+
+        /* Panel Headers */
+        .panel-header {
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            margin-bottom: 12px;
-            padding-bottom: 8px;
-            border-bottom: 2px solid #1B263B;
+            justify-content: space-between;
+            padding: 24px;
+            border-bottom: 1px solid #e2e8f0;
         }
 
-        .legend-title {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: #1B263B;
-            margin: 0;
+        .panel-title-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
 
-        .legend-toggle {
-            background: linear-gradient(135deg, #1B263B 0%, #415A77 100%);
+        .panel-icon {
+            padding: 8px;
+            border-radius: 12px;
             color: white;
-            border: none;
-            border-radius: 50%;
-            width: 32px;
-            height: 32px;
-            cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(27, 38, 59, 0.3);
-            font-size: 0.8rem;
         }
 
-        .legend-toggle:hover {
-            transform: scale(1.1);
-            box-shadow: 0 6px 20px rgba(27, 38, 59, 0.4);
+        .panel-icon.layers { 
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); 
+        }
+        .panel-icon.legend { 
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%); 
+        }
+        .panel-icon.info { 
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); 
         }
 
-        .legend-content {
+        .panel-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1e293b;
+            margin: 0;
+        }
+
+        .panel-toggle {
+            padding: 8px;
+            background: transparent;
+            border: none;
+            border-radius: 12px;
+            color: #64748b;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .panel-toggle:hover {
+            background: #f1f5f9;
+            color: #1e293b;
+        }
+
+        /* Panel Content */
+        .panel-content {
+            padding: 24px;
             transition: all 0.3s ease;
-            max-height: 500px;
+        }
+
+        .collapsed .panel-content {
+            display: none;
+        }
+
+        /* Section Styles */
+        .section-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #475569;
+            margin-bottom: 12px;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #475569;
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        /* Basemap Selector */
+        .basemap-section {
+            margin-bottom: 24px;
+        }
+
+        .basemap-select {
+            width: 100%;
+            padding: 12px 16px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            color: #1e293b;
+            transition: all 0.2s ease;
+        }
+
+        .basemap-select:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        /* Layer Items */
+        .layer-section {
+            margin-bottom: 24px;
+        }
+
+        .layer-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-height: 320px;
             overflow-y: auto;
         }
 
-        .legend-panel.collapsed .legend-content {
-            display: none;
+        .layer-item {
+            padding: 16px;
+            background: rgba(248, 250, 252, 0.5);
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .layer-item:hover {
+            background: #f8fafc;
+            border-color: #cbd5e1;
+        }
+
+        .layer-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .layer-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+        }
+
+        .layer-icon {
+            color: #64748b;
+            width: 16px;
+            height: 16px;
+        }
+
+        .layer-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: #475569;
+        }
+
+        .visibility-toggle {
+            padding: 6px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .visibility-toggle.visible {
+            background: #dbeafe;
+            color: #2563eb;
+        }
+
+        .visibility-toggle.hidden {
+            background: #e2e8f0;
+            color: #94a3b8;
+        }
+
+        .visibility-toggle:hover.visible {
+            background: #bfdbfe;
+        }
+
+        .visibility-toggle:hover.hidden {
+            background: #cbd5e1;
+        }
+
+        /* Opacity Controls */
+        .opacity-control {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .opacity-label {
+            font-size: 12px;
+            font-weight: 500;
+            color: #64748b;
+            min-width: 60px;
+        }
+
+        .opacity-slider {
+            flex: 1;
+            height: 6px;
+            background: #e2e8f0;
+            border-radius: 3px;
+            outline: none;
+            -webkit-appearance: none;
+            appearance: none;
+            cursor: pointer;
+        }
+
+        .opacity-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            background: #3b82f6;
+            border-radius: 50%;
+            border: 2px solid white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .opacity-slider::-webkit-slider-thumb:hover {
+            background: #2563eb;
+            transform: scale(1.1);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .opacity-value {
+            font-size: 12px;
+            font-weight: 500;
+            color: #64748b;
+            min-width: 35px;
+        }
+
+        /* Legend Items */
+        .legend-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-height: 384px;
+            overflow-y: auto;
         }
 
         .legend-item {
             display: flex;
             align-items: center;
-            margin-bottom: 10px;
-            padding: 8px;
-            border-radius: 8px;
-            transition: all 0.3s ease;
+            gap: 16px;
+            padding: 12px;
+            border-radius: 12px;
             cursor: pointer;
-            border: 1px solid transparent;
+            transition: all 0.2s ease;
         }
 
         .legend-item:hover {
-            background-color: rgba(27, 38, 59, 0.08);
-            border-color: rgba(27, 38, 59, 0.2);
-            transform: translateX(3px);
+            background: #f8fafc;
         }
 
         .legend-symbol {
-            width: 20px;
-            height: 20px;
-            margin-right: 10px;
-            border: 2px solid #333;
-            border-radius: 3px;
+            width: 24px;
+            height: 24px;
+            border-radius: 8px;
+            border: 2px solid;
             flex-shrink: 0;
             position: relative;
         }
 
-        .legend-symbol.polygon {
-            background-color: var(--symbol-color);
-            opacity: 0.7;
-        }
-
-        .legend-symbol.line {
-            background: linear-gradient(to right, transparent 0%, var(--symbol-color) 20%, var(--symbol-color) 80%, transparent 100%);
-            height: 4px;
-            margin-top: 8px;
-            margin-bottom: 8px;
-            border: none;
-            border-radius: 2px;
-        }
-
         .legend-label {
-            font-size: 0.85rem;
+            flex: 1;
+            font-size: 14px;
             font-weight: 500;
-            color: #333;
-            flex-grow: 1;
+            color: #475569;
         }
 
-        .legend-checkbox {
-            margin-left: 8px;
-            transform: scale(1.1);
-            accent-color: #1B263B;
-        }
-
-        /* Layer Control Panel */
-        .layer-control-panel {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            background: linear-gradient(145deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 248, 248, 0.98) 100%);
-            border: 2px solid #1B263B;
-            border-radius: 12px;
-            padding: 15px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-            backdrop-filter: blur(10px);
-            min-width: 260px;
-            z-index: 2000;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .layer-control-panel.collapsed {
-            transform: translateX(calc(-100% + 45px));
-        }
-
-        .layer-control-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-            padding-bottom: 8px;
-            border-bottom: 2px solid #1B263B;
-        }
-
-        .layer-control-title {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: #1B263B;
-            margin: 0;
-        }
-
-        .layer-control-toggle {
-            background: linear-gradient(135deg, #1B263B 0%, #415A77 100%);
-            color: white;
+        .legend-toggle {
+            padding: 6px;
             border: none;
-            border-radius: 50%;
-            width: 32px;
-            height: 32px;
+            border-radius: 8px;
             cursor: pointer;
+            transition: all 0.2s ease;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(27, 38, 59, 0.3);
-            font-size: 0.8rem;
         }
 
-        .layer-control-toggle:hover {
-            transform: scale(1.1);
-            box-shadow: 0 6px 20px rgba(27, 38, 59, 0.4);
+        .legend-toggle.visible {
+            background: #dcfce7;
+            color: #16a34a;
         }
 
-        .layer-control-content {
-            transition: all 0.3s ease;
-            max-height: 400px;
-            overflow-y: auto;
+        .legend-toggle.hidden {
+            background: #e2e8f0;
+            color: #94a3b8;
         }
 
-        .layer-control-panel.collapsed .layer-control-content {
-            display: none;
-        }
-
-        .basemap-selector {
-            margin-bottom: 15px;
-        }
-
-        .basemap-selector label {
-            display: block;
-            font-weight: 500;
-            color: #1B263B;
-            margin-bottom: 6px;
-            font-size: 0.9rem;
-        }
-
-        .basemap-selector select {
-            width: 100%;
-            padding: 8px 10px;
-            border: 2px solid #1B263B;
-            border-radius: 6px;
-            background: white;
-            font-family: 'Poppins', sans-serif;
-            font-size: 0.85rem;
-            transition: all 0.3s ease;
-        }
-
-        .basemap-selector select:focus {
-            outline: none;
-            border-color: #415A77;
-            box-shadow: 0 0 0 3px rgba(65, 90, 119, 0.2);
-        }
-
-        .layer-group {
-            margin-bottom: 15px;
-        }
-
-        .layer-group-title {
-            font-weight: 600;
-            color: #1B263B;
-            margin-bottom: 8px;
-            font-size: 0.9rem;
-            border-bottom: 1px solid #e0e0e0;
-            padding-bottom: 4px;
-        }
-
-        .layer-item {
+        /* Info Panel */
+        .info-content {
             display: flex;
             flex-direction: column;
-            margin-bottom: 10px;
-            padding: 8px;
-            border-radius: 6px;
-            transition: all 0.3s ease;
-            border: 1px solid transparent;
+            gap: 12px;
+            font-size: 14px;
         }
 
-        .layer-item:hover {
-            background-color: rgba(27, 38, 59, 0.05);
-            border-color: rgba(27, 38, 59, 0.1);
-        }
-
-        .layer-item-header {
+        .info-row {
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            margin-bottom: 5px;
         }
 
-        .layer-item input[type="checkbox"] {
-            margin-right: 8px;
-            transform: scale(1.1);
-            accent-color: #1B263B;
-        }
-
-        .layer-item label {
-            font-size: 0.85rem;
-            color: #333;
-            cursor: pointer;
-            flex-grow: 1;
+        .info-label {
             font-weight: 500;
+            color: #64748b;
         }
 
-        .opacity-container {
-            display: flex;
-            align-items: center;
-            margin-top: 5px;
-            padding-left: 20px;
+        .info-value {
+            color: #1e293b;
+            font-family: 'JetBrains Mono', monospace;
         }
 
-        .opacity-label {
-            font-size: 0.75rem;
-            color: #666;
-            margin-right: 8px;
-            min-width: 60px;
+        /* Custom Scrollbar */
+        .layer-list::-webkit-scrollbar,
+        .legend-list::-webkit-scrollbar {
+            width: 6px;
         }
 
-        .opacity-slider {
-            flex-grow: 1;
-            accent-color: #1B263B;
-            height: 4px;
+        .layer-list::-webkit-scrollbar-track,
+        .legend-list::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 3px;
         }
 
-        .opacity-value {
-            font-size: 0.75rem;
-            color: #666;
-            margin-left: 8px;
-            min-width: 30px;
+        .layer-list::-webkit-scrollbar-thumb,
+        .legend-list::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
         }
 
-        /* Map Info Panel */
-        .map-info {
-            position: absolute;
-            bottom: 10px;
-            left: 10px;
-            background: linear-gradient(145deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 248, 248, 0.98) 100%);
-            border: 2px solid #1B263B;
-            border-radius: 12px;
-            padding: 12px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-            backdrop-filter: blur(10px);
-            max-width: 280px;
-            z-index: 2000;
-        }
-
-        .map-info h4 {
-            margin: 0 0 8px 0;
-            color: #1B263B;
-            font-size: 0.95rem;
-            font-weight: 600;
-        }
-
-        .map-info p {
-            margin: 0 0 4px 0;
-            font-size: 0.75rem;
-            color: #666;
-            line-height: 1.4;
+        .layer-list::-webkit-scrollbar-thumb:hover,
+        .legend-list::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
         }
 
         /* Responsive Design */
         @media (max-width: 768px) {
-            .legend-panel, .layer-control-panel {
+            .layer-control-panel,
+            .legend-panel {
                 position: fixed;
                 top: 10px;
                 left: 10px;
@@ -376,43 +437,50 @@
                 bottom: 10px;
             }
             
-            .map-info {
+            .map-info-panel {
                 display: none;
             }
         }
 
-        /* Custom scrollbar */
-        .legend-content::-webkit-scrollbar,
-        .layer-control-content::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        .legend-content::-webkit-scrollbar-track,
-        .layer-control-content::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 3px;
-        }
-
-        .legend-content::-webkit-scrollbar-thumb,
-        .layer-control-content::-webkit-scrollbar-thumb {
-            background: #1B263B;
-            border-radius: 3px;
-        }
-
-        .legend-content::-webkit-scrollbar-thumb:hover,
-        .layer-control-content::-webkit-scrollbar-thumb:hover {
-            background: #415A77;
-        }
-        </style>
-
-        <style>
+        /* Map Styles */
         html, body, #map {
             width: 100%;
             height: 100%;
             padding: 0;
             margin: 0;
         }
+
+        .ol-control > * {
+            background-color: rgba(255, 255, 255, 0.9)!important;
+            color: #1e293b!important;
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+        }
+
+        .ol-control {
+            background-color: transparent !important;
+            padding: 4px !important;
+        }
+
+        /* Toggle button when collapsed */
+        .collapsed .panel-toggle {
+            position: absolute;
+            right: -40px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 10;
+        }
+
+        .legend-panel.collapsed .panel-toggle {
+            left: -40px;
+            right: auto;
+        }
         </style>
+
         <title>SITAU - Peta Interaktif Desa Bawu</title>
     </head>
     <body>
@@ -424,18 +492,27 @@
         </div>
 
         <!-- Layer Control Panel -->
-        <div class="layer-control-panel" id="layerControlPanel">
-            <div class="layer-control-header">
-                <h3 class="layer-control-title">Kontrol Layer</h3>
-                <button class="layer-control-toggle" id="layerControlToggle">
-                    ◀
+        <div class="modern-panel layer-control-panel" id="layerControlPanel">
+            <div class="panel-header">
+                <div class="panel-title-group">
+                    <div class="panel-icon layers">
+                        <i data-lucide="layers" style="width: 20px; height: 20px;"></i>
+                    </div>
+                    <h3 class="panel-title">Kontrol Layer</h3>
+                </div>
+                <button class="panel-toggle" id="layerControlToggle">
+                    <i data-lucide="chevron-left" style="width: 20px; height: 20px;"></i>
                 </button>
             </div>
-            <div class="layer-control-content">
+            
+            <div class="panel-content">
                 <!-- Basemap Selector -->
-                <div class="basemap-selector">
-                    <label for="basemapSelect">Peta Dasar:</label>
-                    <select id="basemapSelect">
+                <div class="basemap-section">
+                    <div class="section-label">
+                        <i data-lucide="map" style="width: 16px; height: 16px;"></i>
+                        Peta Dasar
+                    </div>
+                    <select class="basemap-select" id="basemapSelect">
                         <option value="osm">OpenStreetMap</option>
                         <option value="satellite">Citra Satelit</option>
                         <option value="terrain">Terrain</option>
@@ -444,54 +521,79 @@
                 </div>
 
                 <!-- Data Layers -->
-                <div class="layer-group">
-                    <div class="layer-group-title">Layer Data Pertanahan</div>
-                    
-                    <div class="layer-item">
-                        <div class="layer-item-header">
-                            <input type="checkbox" id="bidangTanahLayer" checked>
-                            <label for="bidangTanahLayer">Bidang Tanah</label>
-                        </div>
-                        <div class="opacity-container">
-                            <span class="opacity-label">Opacity:</span>
-                            <input type="range" class="opacity-slider" id="bidangTanahOpacity" min="0" max="100" value="100">
-                            <span class="opacity-value" id="bidangTanahOpacityValue">100%</span>
-                        </div>
+                <div class="layer-section">
+                    <div class="section-title">
+                        <i data-lucide="settings" style="width: 16px; height: 16px;"></i>
+                        Layer Data Pertanahan
                     </div>
                     
-                    <div class="layer-item">
-                        <div class="layer-item-header">
-                            <input type="checkbox" id="hakLayer" checked>
-                            <label for="hakLayer">Hak Kepemilikan</label>
+                    <div class="layer-list">
+                        <div class="layer-item" data-layer="bidangTanah">
+                            <div class="layer-header">
+                                <div class="layer-info">
+                                    <i data-lucide="map-pin" class="layer-icon"></i>
+                                    <span class="layer-name">Bidang Tanah</span>
+                                </div>
+                                <button class="visibility-toggle visible" data-layer="bidangTanah">
+                                    <i data-lucide="eye" style="width: 16px; height: 16px;"></i>
+                                </button>
+                            </div>
+                            <div class="opacity-control">
+                                <span class="opacity-label">Opacity:</span>
+                                <input type="range" class="opacity-slider" min="0" max="100" value="100" data-layer="bidangTanah">
+                                <span class="opacity-value">100%</span>
+                            </div>
                         </div>
-                        <div class="opacity-container">
-                            <span class="opacity-label">Opacity:</span>
-                            <input type="range" class="opacity-slider" id="hakOpacity" min="0" max="100" value="100">
-                            <span class="opacity-value" id="hakOpacityValue">100%</span>
+
+                        <div class="layer-item" data-layer="hak">
+                            <div class="layer-header">
+                                <div class="layer-info">
+                                    <i data-lucide="home" class="layer-icon"></i>
+                                    <span class="layer-name">Hak Kepemilikan</span>
+                                </div>
+                                <button class="visibility-toggle visible" data-layer="hak">
+                                    <i data-lucide="eye" style="width: 16px; height: 16px;"></i>
+                                </button>
+                            </div>
+                            <div class="opacity-control">
+                                <span class="opacity-label">Opacity:</span>
+                                <input type="range" class="opacity-slider" min="0" max="100" value="100" data-layer="hak">
+                                <span class="opacity-value">100%</span>
+                            </div>
                         </div>
-                    </div>
-                    
-                    <div class="layer-item">
-                        <div class="layer-item-header">
-                            <input type="checkbox" id="plLayer" checked>
-                            <label for="plLayer">Penggunaan Lahan</label>
+
+                        <div class="layer-item" data-layer="pl">
+                            <div class="layer-header">
+                                <div class="layer-info">
+                                    <i data-lucide="tree-pine" class="layer-icon"></i>
+                                    <span class="layer-name">Penggunaan Lahan</span>
+                                </div>
+                                <button class="visibility-toggle visible" data-layer="pl">
+                                    <i data-lucide="eye" style="width: 16px; height: 16px;"></i>
+                                </button>
+                            </div>
+                            <div class="opacity-control">
+                                <span class="opacity-label">Opacity:</span>
+                                <input type="range" class="opacity-slider" min="0" max="100" value="100" data-layer="pl">
+                                <span class="opacity-value">100%</span>
+                            </div>
                         </div>
-                        <div class="opacity-container">
-                            <span class="opacity-label">Opacity:</span>
-                            <input type="range" class="opacity-slider" id="plOpacity" min="0" max="100" value="100">
-                            <span class="opacity-value" id="plOpacityValue">100%</span>
-                        </div>
-                    </div>
-                    
-                    <div class="layer-item">
-                        <div class="layer-item-header">
-                            <input type="checkbox" id="zntLayer" checked>
-                            <label for="zntLayer">Zona Nilai Tanah</label>
-                        </div>
-                        <div class="opacity-container">
-                            <span class="opacity-label">Opacity:</span>
-                            <input type="range" class="opacity-slider" id="zntOpacity" min="0" max="100" value="100">
-                            <span class="opacity-value" id="zntOpacityValue">100%</span>
+
+                        <div class="layer-item" data-layer="znt">
+                            <div class="layer-header">
+                                <div class="layer-info">
+                                    <i data-lucide="building" class="layer-icon"></i>
+                                    <span class="layer-name">Zona Nilai Tanah</span>
+                                </div>
+                                <button class="visibility-toggle visible" data-layer="znt">
+                                    <i data-lucide="eye" style="width: 16px; height: 16px;"></i>
+                                </button>
+                            </div>
+                            <div class="opacity-control">
+                                <span class="opacity-label">Opacity:</span>
+                                <input type="range" class="opacity-slider" min="0" max="100" value="100" data-layer="znt">
+                                <span class="opacity-value">100%</span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -499,78 +601,90 @@
         </div>
 
         <!-- Legend Panel -->
-        <div class="legend-panel" id="legendPanel">
-            <div class="legend-header">
-                <h3 class="legend-title">Legenda Peta</h3>
-                <button class="legend-toggle" id="legendToggle">
-                    ▶
+        <div class="modern-panel legend-panel" id="legendPanel">
+            <div class="panel-header">
+                <div class="panel-title-group">
+                    <div class="panel-icon legend">
+                        <i data-lucide="info" style="width: 20px; height: 20px;"></i>
+                    </div>
+                    <h3 class="panel-title">Layer Peta</h3>
+                </div>
+                <button class="panel-toggle" id="legendToggle">
+                    <i data-lucide="chevron-right" style="width: 20px; height: 20px;"></i>
                 </button>
             </div>
-            <div class="legend-content">
-                <!-- Bidang Tanah Legend -->
-                <div class="legend-item" data-layer="bidangTanah">
-                    <div class="legend-symbol polygon" style="--symbol-color: #ff6b6b; border-color: #e55656;"></div>
-                    <span class="legend-label">Bidang Tanah</span>
-                    <input type="checkbox" class="legend-checkbox" id="legendBidangTanah" checked>
-                </div>
+            
+            <div class="panel-content">
+                <div class="legend-list">
+                    <div class="legend-item" data-layer="bidangTanah">
+                        <div class="legend-symbol" style="background-color: #ff6b6b80; border-color: #ff6b6b;"></div>
+                        <span class="legend-label">Bidang Tanah</span>
+                        <button class="legend-toggle visible">
+                            <i data-lucide="eye" style="width: 14px; height: 14px;"></i>
+                        </button>
+                    </div>
 
-                <!-- Hak Kepemilikan Legend -->
-                <div class="legend-item" data-layer="hak">
-                    <div class="legend-symbol polygon" style="--symbol-color: #4ecdc4; border-color: #45b7aa;"></div>
-                    <span class="legend-label">Hak Kepemilikan</span>
-                    <input type="checkbox" class="legend-checkbox" id="legendHak" checked>
-                </div>
+                    <div class="legend-item" data-layer="hak">
+                        <div class="legend-symbol" style="background-color: #4ecdc480; border-color: #4ecdc4;"></div>
+                        <span class="legend-label">Hak Kepemilikan</span>
+                        <button class="legend-toggle visible">
+                            <i data-lucide="eye" style="width: 14px; height: 14px;"></i>
+                        </button>
+                    </div>
 
-                <!-- Penggunaan Lahan Legend -->
-                <div class="legend-item" data-layer="pl">
-                    <div class="legend-symbol polygon" style="--symbol-color: #45b7d1; border-color: #3a9bc1;"></div>
-                    <span class="legend-label">Penggunaan Lahan</span>
-                    <input type="checkbox" class="legend-checkbox" id="legendPl" checked>
-                </div>
+                    <div class="legend-item" data-layer="pl">
+                        <div class="legend-symbol" style="background-color: #45b7d180; border-color: #45b7d1;"></div>
+                        <span class="legend-label">Penggunaan Lahan</span>
+                        <button class="legend-toggle visible">
+                            <i data-lucide="eye" style="width: 14px; height: 14px;"></i>
+                        </button>
+                    </div>
 
-                <!-- Zona Nilai Tanah Legend -->
-                <div class="legend-item" data-layer="znt">
-                    <div class="legend-symbol polygon" style="--symbol-color: #f9ca24; border-color: #f0b90b;"></div>
-                    <span class="legend-label">Zona Nilai Tanah</span>
-                    <input type="checkbox" class="legend-checkbox" id="legendZnt" checked>
-                </div>
-
-                <!-- Additional Legend Items -->
-                <div class="legend-item">
-                    <div class="legend-symbol line" style="--symbol-color: #6c5ce7;"></div>
-                    <span class="legend-label">Batas Administrasi</span>
-                    <input type="checkbox" class="legend-checkbox" checked>
-                </div>
-
-                <div class="legend-item">
-                    <div class="legend-symbol line" style="--symbol-color: #2d3436;"></div>
-                    <span class="legend-label">Jalan Utama</span>
-                    <input type="checkbox" class="legend-checkbox" checked>
-                </div>
-
-                <div class="legend-item">
-                    <div class="legend-symbol polygon" style="--symbol-color: #fd79a8; border-color: #e84393;"></div>
-                    <span class="legend-label">Area Pemukiman</span>
-                    <input type="checkbox" class="legend-checkbox" checked>
-                </div>
-
-                <div class="legend-item">
-                    <div class="legend-symbol polygon" style="--symbol-color: #00b894; border-color: #00a085;"></div>
-                    <span class="legend-label">Area Pertanian</span>
-                    <input type="checkbox" class="legend-checkbox" checked>
+                    <div class="legend-item" data-layer="znt">
+                        <div class="legend-symbol" style="background-color: #f9ca2480; border-color: #f9ca24;"></div>
+                        <span class="legend-label">Zona Nilai Tanah</span>
+                        <button class="legend-toggle visible">
+                            <i data-lucide="eye" style="width: 14px; height: 14px;"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
 
         <!-- Map Information Panel -->
-        <div class="map-info">
-            <h4>ℹ️ Informasi Peta</h4>
-            <p><strong>Lokasi:</strong> Desa Bawu, Kemusu, Boyolali</p>
-            <p><strong>Koordinat:</strong> <span id="mouseCoords">-</span></p>
-            <p><strong>Skala:</strong> <span id="mapScale">1:10,000</span></p>
-            <p><strong>Proyeksi:</strong> EPSG:3857 (Web Mercator)</p>
+        <div class="modern-panel map-info-panel">
+            <div class="panel-header">
+                <div class="panel-title-group">
+                    <div class="panel-icon info">
+                        <i data-lucide="info" style="width: 20px; height: 20px;"></i>
+                    </div>
+                    <h4 class="panel-title">Informasi Peta</h4>
+                </div>
+            </div>
+            
+            <div class="panel-content">
+                <div class="info-content">
+                    <div class="info-row">
+                        <span class="info-label">Lokasi:</span>
+                        <span class="info-value">Desa Bawu, Kemusu, Boyolali</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Koordinat:</span>
+                        <span class="info-value" id="mouseCoords">-7.5234°, 110.7234°</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Skala:</span>
+                        <span class="info-value" id="mapScale">1:10,000</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Proyeksi:</span>
+                        <span class="info-value">EPSG:3857</span>
+                    </div>
+                </div>
+            </div>
         </div>
 
+        <!-- Include your existing map scripts -->
         <script src="resources/qgis2web_expressions.js"></script>
         <script src="./resources/functions.js"></script>
         <script src="./resources/ol.js"></script>
@@ -588,15 +702,26 @@
         <script src="./resources/qgis2web.js"></script>
 
         <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
         // Wait for map to be initialized
         let mapInitialized = false;
         let layerReferences = {};
+
+        // Layer state management
+        const layerState = {
+            bidangTanah: { visible: true, opacity: 100 },
+            hak: { visible: true, opacity: 100 },
+            pl: { visible: true, opacity: 100 },
+            znt: { visible: true, opacity: 100 }
+        };
 
         // Function to wait for map initialization
         function waitForMap() {
             if (typeof map !== 'undefined' && map) {
                 mapInitialized = true;
-                initializeControls();
+                initializeModernControls();
                 setupLayerReferences();
             } else {
                 setTimeout(waitForMap, 100);
@@ -619,121 +744,146 @@
             }
         }
 
-        // Initialize all controls
-        function initializeControls() {
-            // Legend Panel Toggle
-            const legendPanel = document.getElementById('legendPanel');
-            const legendToggle = document.getElementById('legendToggle');
+        // Initialize modern controls
+        function initializeModernControls() {
+            // Panel toggles
+            setupPanelToggles();
             
-            legendToggle.addEventListener('click', function() {
-                legendPanel.classList.toggle('collapsed');
-                legendToggle.textContent = legendPanel.classList.contains('collapsed') ? '◀' : '▶';
-            });
-
-            // Layer Control Panel Toggle
-            const layerControlPanel = document.getElementById('layerControlPanel');
-            const layerControlToggle = document.getElementById('layerControlToggle');
+            // Basemap switching
+            setupBasemapControl();
             
-            layerControlToggle.addEventListener('click', function() {
-                layerControlPanel.classList.toggle('collapsed');
-                layerControlToggle.textContent = layerControlPanel.classList.contains('collapsed') ? '▶' : '◀';
-            });
-
-            // Basemap Switching
-            const basemapSelect = document.getElementById('basemapSelect');
-            basemapSelect.addEventListener('change', function() {
-                switchBasemap(this.value);
-            });
-
-            // Layer Visibility Controls
-            setupLayerControls();
-
-            // Opacity Controls
+            // Layer visibility controls
+            setupLayerVisibilityControls();
+            
+            // Opacity controls
             setupOpacityControls();
-
-            // Legend Checkbox Controls
+            
+            // Legend controls
             setupLegendControls();
-
-            // Mouse coordinate tracking
+            
+            // Coordinate tracking
             setupCoordinateTracking();
-
+            
             // Scale tracking
             setupScaleTracking();
         }
 
-        // Setup layer visibility controls
-        function setupLayerControls() {
-            const layerCheckboxes = {
-                'bidangTanahLayer': 'bidangTanah',
-                'hakLayer': 'hak',
-                'plLayer': 'pl',
-                'zntLayer': 'znt'
-            };
+        // Setup panel toggles
+        function setupPanelToggles() {
+            const layerControlPanel = document.getElementById('layerControlPanel');
+            const layerControlToggle = document.getElementById('layerControlToggle');
+            const legendPanel = document.getElementById('legendPanel');
+            const legendToggle = document.getElementById('legendToggle');
 
-            Object.keys(layerCheckboxes).forEach(checkboxId => {
-                const checkbox = document.getElementById(checkboxId);
-                if (checkbox) {
-                    checkbox.addEventListener('change', function() {
-                        const layerKey = layerCheckboxes[checkboxId];
-                        toggleLayerVisibility(layerKey, this.checked);
-                        
-                        // Sync with legend
-                        const legendCheckbox = document.getElementById('legend' + layerKey.charAt(0).toUpperCase() + layerKey.slice(1));
-                        if (legendCheckbox) {
-                            legendCheckbox.checked = this.checked;
-                        }
-                    });
+            // Layer Control Panel Toggle
+            layerControlToggle.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                layerControlPanel.classList.toggle('collapsed');
+                const icon = layerControlToggle.querySelector('i');
+                
+                if (layerControlPanel.classList.contains('collapsed')) {
+                    icon.setAttribute('data-lucide', 'chevron-right');
+                } else {
+                    icon.setAttribute('data-lucide', 'chevron-left');
                 }
+                
+                lucide.createIcons();
+            });
+
+            // Legend Panel Toggle
+            legendToggle.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                legendPanel.classList.toggle('collapsed');
+                const icon = legendToggle.querySelector('i');
+                
+                if (legendPanel.classList.contains('collapsed')) {
+                    icon.setAttribute('data-lucide', 'chevron-left');
+                } else {
+                    icon.setAttribute('data-lucide', 'chevron-right');
+                }
+                
+                lucide.createIcons();
+            });
+        }
+
+        // Setup basemap control
+        function setupBasemapControl() {
+            const basemapSelect = document.getElementById('basemapSelect');
+            basemapSelect.addEventListener('change', function() {
+                switchBasemap(this.value);
+            });
+        }
+
+        // Setup layer visibility controls
+        function setupLayerVisibilityControls() {
+            const visibilityToggles = document.querySelectorAll('.visibility-toggle');
+            
+            visibilityToggles.forEach(toggle => {
+                toggle.addEventListener('click', function() {
+                    const layerKey = this.getAttribute('data-layer');
+                    const isVisible = layerState[layerKey].visible;
+                    
+                    // Toggle visibility
+                    layerState[layerKey].visible = !isVisible;
+                    toggleLayerVisibility(layerKey, !isVisible);
+                    
+                    // Update button appearance
+                    updateVisibilityButton(this, !isVisible);
+                    
+                    // Sync with legend
+                    syncLegendToggle(layerKey, !isVisible);
+                });
             });
         }
 
         // Setup opacity controls
         function setupOpacityControls() {
-            const opacitySliders = {
-                'bidangTanahOpacity': 'bidangTanah',
-                'hakOpacity': 'hak',
-                'plOpacity': 'pl',
-                'zntOpacity': 'znt'
-            };
-
-            Object.keys(opacitySliders).forEach(sliderId => {
-                const slider = document.getElementById(sliderId);
-                const valueDisplay = document.getElementById(sliderId + 'Value');
-                
-                if (slider && valueDisplay) {
-                    slider.addEventListener('input', function() {
-                        const layerKey = opacitySliders[sliderId];
-                        const opacity = this.value / 100;
-                        setLayerOpacity(layerKey, opacity);
-                        valueDisplay.textContent = this.value + '%';
-                    });
-                }
+            const opacitySliders = document.querySelectorAll('.opacity-slider');
+            
+            opacitySliders.forEach(slider => {
+                slider.addEventListener('input', function() {
+                    const layerKey = this.getAttribute('data-layer');
+                    const opacity = parseInt(this.value);
+                    
+                    // Update layer opacity
+                    layerState[layerKey].opacity = opacity;
+                    setLayerOpacity(layerKey, opacity / 100);
+                    
+                    // Update display value
+                    const valueDisplay = this.parentElement.querySelector('.opacity-value');
+                    valueDisplay.textContent = opacity + '%';
+                });
             });
         }
 
         // Setup legend controls
         function setupLegendControls() {
-            const legendCheckboxes = {
-                'legendBidangTanah': 'bidangTanah',
-                'legendHak': 'hak',
-                'legendPl': 'pl',
-                'legendZnt': 'znt'
-            };
-
-            Object.keys(legendCheckboxes).forEach(checkboxId => {
-                const checkbox = document.getElementById(checkboxId);
-                if (checkbox) {
-                    checkbox.addEventListener('change', function() {
-                        const layerKey = legendCheckboxes[checkboxId];
-                        toggleLayerVisibility(layerKey, this.checked);
+            const legendToggles = document.querySelectorAll('.legend-toggle');
+            
+            legendToggles.forEach(toggle => {
+                toggle.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const legendItem = this.closest('.legend-item');
+                    const layerKey = legendItem.getAttribute('data-layer');
+                    
+                    if (layerKey && layerState[layerKey]) {
+                        const isVisible = layerState[layerKey].visible;
+                        
+                        // Toggle visibility
+                        layerState[layerKey].visible = !isVisible;
+                        toggleLayerVisibility(layerKey, !isVisible);
+                        
+                        // Update legend button
+                        updateLegendButton(this, !isVisible);
                         
                         // Sync with layer control
-                        const layerCheckbox = document.getElementById(layerKey + 'Layer');
-                        if (layerCheckbox) {
-                            layerCheckbox.checked = this.checked;
-                        }
-                    });
-                }
+                        syncVisibilityToggle(layerKey, !isVisible);
+                    }
+                });
             });
         }
 
@@ -768,13 +918,42 @@
             }
         }
 
+        // Helper functions
+        function updateVisibilityButton(button, isVisible) {
+            const icon = button.querySelector('i');
+            button.className = `visibility-toggle ${isVisible ? 'visible' : 'hidden'}`;
+            icon.setAttribute('data-lucide', isVisible ? 'eye' : 'eye-off');
+            lucide.createIcons();
+        }
+
+        function updateLegendButton(button, isVisible) {
+            const icon = button.querySelector('i');
+            button.className = `legend-toggle ${isVisible ? 'visible' : 'hidden'}`;
+            icon.setAttribute('data-lucide', isVisible ? 'eye' : 'eye-off');
+            lucide.createIcons();
+        }
+
+        function syncLegendToggle(layerKey, isVisible) {
+            const legendItem = document.querySelector(`.legend-item[data-layer="${layerKey}"]`);
+            if (legendItem) {
+                const legendToggle = legendItem.querySelector('.legend-toggle');
+                updateLegendButton(legendToggle, isVisible);
+            }
+        }
+
+        function syncVisibilityToggle(layerKey, isVisible) {
+            const visibilityToggle = document.querySelector(`.visibility-toggle[data-layer="${layerKey}"]`);
+            if (visibilityToggle) {
+                updateVisibilityButton(visibilityToggle, isVisible);
+            }
+        }
+
         // Basemap switching function
         function switchBasemap(basemapType) {
             if (!map) return;
             
-            // Remove existing base layer
             const layers = map.getLayers().getArray();
-            const baseLayer = layers[0]; // Assuming first layer is base layer
+            const baseLayer = layers[0];
             
             let newBaseLayer;
             
@@ -803,17 +982,16 @@
                         })
                     });
                     break;
-                default: // osm
+                default:
                     newBaseLayer = new ol.layer.Tile({
                         source: new ol.source.OSM()
                     });
             }
             
-            // Replace base layer
             map.getLayers().setAt(0, newBaseLayer);
         }
 
-        // Layer visibility toggle function
+        // Layer control functions
         function toggleLayerVisibility(layerKey, visible) {
             const layer = layerReferences[layerKey];
             if (layer) {
@@ -821,7 +999,6 @@
             }
         }
 
-        // Layer opacity function
         function setLayerOpacity(layerKey, opacity) {
             const layer = layerReferences[layerKey];
             if (layer) {
@@ -837,22 +1014,27 @@
                 
                 if (legendPanel && !legendPanel.classList.contains('collapsed')) {
                     legendPanel.classList.add('collapsed');
-                    document.getElementById('legendToggle').textContent = '◀';
+                    const legendToggle = document.getElementById('legendToggle');
+                    const icon = legendToggle.querySelector('i');
+                    icon.setAttribute('data-lucide', 'chevron-left');
+                    lucide.createIcons();
                 }
                 
                 if (layerControlPanel && !layerControlPanel.classList.contains('collapsed')) {
                     layerControlPanel.classList.add('collapsed');
-                    document.getElementById('layerControlToggle').textContent = '▶';
+                    const layerToggle = document.getElementById('layerControlToggle');
+                    const icon = layerToggle.querySelector('i');
+                    icon.setAttribute('data-lucide', 'chevron-right');
+                    lucide.createIcons();
                 }
             }
         });
 
-        // Start initialization when DOM is loaded
+        // Initialize when DOM is ready
         document.addEventListener('DOMContentLoaded', function() {
             waitForMap();
         });
 
-        // Also try to initialize immediately in case DOM is already loaded
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', waitForMap);
         } else {
