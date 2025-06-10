@@ -123,6 +123,41 @@
             color: #1e293b;
         }
 
+        /* Toggle button when collapsed */
+        .collapsed .panel-toggle {
+            position: absolute;
+            right: -48px; /* Increased slightly for better click area */
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 3000; /* Higher z-index to ensure clickability */
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 12px;
+        }
+
+        .legend-panel.collapsed .panel-toggle {
+            left: -48px; /* Adjusted for legend panel */
+            right: auto;
+        }
+
+        /* Ensure panels don’t interfere with clicks when collapsed */
+        .modern-panel.collapsed {
+            overflow: visible; /* Allow toggle button to be accessible outside panel bounds */
+        }
+
+        /* Hover effect for better feedback */
+        .panel-toggle:hover {
+            background: #f1f5f9;
+            color: #1e293b;
+            transform: translateY(-50%) scale(1.05); /* Slight scale for visual feedback */
+        }
+
         /* Panel Content */
         .panel-content {
             padding: 24px;
@@ -440,6 +475,10 @@
             .map-info-panel {
                 display: none;
             }
+            
+            .collapsed .panel-toggle {
+                z-index: 3100; /* Even higher z-index for mobile to ensure clickability */
+            }
         }
 
         /* Map Styles */
@@ -460,24 +499,6 @@
         .ol-control {
             background-color: transparent !important;
             padding: 4px !important;
-        }
-
-        /* Toggle button when collapsed */
-        .collapsed .panel-toggle {
-            position: absolute;
-            right: -40px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            z-index: 10;
-        }
-
-        .legend-panel.collapsed .panel-toggle {
-            left: -40px;
-            right: auto;
         }
         </style>
 
@@ -721,8 +742,8 @@
         function waitForMap() {
             if (typeof map !== 'undefined' && map) {
                 mapInitialized = true;
-                initializeModernControls();
                 setupLayerReferences();
+                initializeModernControls();
             } else {
                 setTimeout(waitForMap, 100);
             }
@@ -776,38 +797,36 @@
             const legendToggle = document.getElementById('legendToggle');
 
             // Layer Control Panel Toggle
-            layerControlToggle.addEventListener('click', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                
-                layerControlPanel.classList.toggle('collapsed');
-                const icon = layerControlToggle.querySelector('i');
-                
-                if (layerControlPanel.classList.contains('collapsed')) {
-                    icon.setAttribute('data-lucide', 'chevron-right');
-                } else {
-                    icon.setAttribute('data-lucide', 'chevron-left');
-                }
-                
-                lucide.createIcons();
-            });
+            if (layerControlToggle && layerControlPanel) {
+                layerControlToggle.addEventListener('click', function() {
+                    layerControlPanel.classList.toggle('collapsed');
+                    const icon = this.querySelector('i');
+                    
+                    if (layerControlPanel.classList.contains('collapsed')) {
+                        icon.setAttribute('data-lucide', 'chevron-right');
+                    } else {
+                        icon.setAttribute('data-lucide', 'chevron-left');
+                    }
+                    
+                    lucide.createIcons();
+                });
+            }
 
             // Legend Panel Toggle
-            legendToggle.addEventListener('click', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                
-                legendPanel.classList.toggle('collapsed');
-                const icon = legendToggle.querySelector('i');
-                
-                if (legendPanel.classList.contains('collapsed')) {
-                    icon.setAttribute('data-lucide', 'chevron-left');
-                } else {
-                    icon.setAttribute('data-lucide', 'chevron-right');
-                }
-                
-                lucide.createIcons();
-            });
+            if (legendToggle && legendPanel) {
+                legendToggle.addEventListener('click', function() {
+                    legendPanel.classList.toggle('collapsed');
+                    const icon = this.querySelector('i');
+                    
+                    if (legendPanel.classList.contains('collapsed')) {
+                        icon.setAttribute('data-lucide', 'chevron-left');
+                    } else {
+                        icon.setAttribute('data-lucide', 'chevron-right');
+                    }
+                    
+                    lucide.createIcons();
+                });
+            }
         }
 
         // Setup basemap control
